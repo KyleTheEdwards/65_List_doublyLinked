@@ -4,12 +4,16 @@
 
 public class List_doublyLinked{
     private Node headSentinel;
+    private Node tailSentinel;
      
     /**
       Construct an empty list
      */
     public List_doublyLinked() {
-        headSentinel = new Node( null,null);
+        headSentinel = new Node( null);
+        tailSentinel = new Node( null);
+        headSentinel.setNextNode(tailSentinel);
+        tailSentinel.setPrevNode(headSentinel);
     }
 
     /**
@@ -23,7 +27,7 @@ public class List_doublyLinked{
     // recursively-called helper
     private int size( Node startingAt) {
         Node next = startingAt.getNextNode();
-        if( next == null) return 0;
+        if( next == tailSentinel || next == null) return 0;
         else return 1+ size( next);
     }
 
@@ -33,20 +37,22 @@ public class List_doublyLinked{
        format:
            # elements [element0,element1,element2,]
       */
-    public String toString() {
-        String stringRep = size() + " elements [";
-
-        for( Node node = headSentinel.getNextNode()
-           ; node != null
-           ; node = node.getNextNode() )
-            stringRep += node.getCargo() + ",";
-        return stringRep + "]";
-    }
-
     /*public String toString() {
         String stringRep = size() + " elements [";
 
-        for( Node node = getLastNode()
+        for( Node node = headSentinel.getNextNode()
+           ; node != tailSentinel
+           ; node = node.getNextNode() )
+            stringRep += node.getCargo() + ",";
+        return stringRep + "]";
+    }*/
+
+    //Keep in mind this prints backwards
+
+    public String toString() {
+        String stringRep = size() + " elements [";
+
+        for( Node node = tailSentinel.getPrevNode()
            ; node != headSentinel
            ; node = node.getPrevNode() ){
           stringRep += node.getCargo() + ",";
@@ -54,7 +60,7 @@ public class List_doublyLinked{
 
         }
         return stringRep + "]";
-    }*/
+    }
 
 
     /**
@@ -66,7 +72,7 @@ public class List_doublyLinked{
         Node afterHead = headSentinel.getNextNode();
         Node newNode = new Node( val, headSentinel.getNextNode(),headSentinel);
         headSentinel.setNextNode( newNode );
-        if(afterHead != null)afterHead.setPrevNode( newNode );
+        afterHead.setPrevNode( newNode );
         return true;
      }
 
@@ -75,7 +81,7 @@ public class List_doublyLinked{
       @return a reference to the node before
               the node at @index
      */
-    private Node getNodeBefore( int index) {
+    /*private Node getNodeBefore( int index) {
         /* iterate through the chain, up to the node
            that holds a reference to the desired node 
            
@@ -88,7 +94,6 @@ public class List_doublyLinked{
            ;  // null loop body since all the action is in the FOR
         return node;
     }*/
-
     private Node getNodeBefore(int index){
       if(index < 0) return headSentinel;
       return getNode(index).getPrevNode();
@@ -106,15 +111,6 @@ public class List_doublyLinked{
            )
            ;  // null loop body since all the action is in the FOR
         return node;
-    }
-
-    private Node getLastNode() {
-      if(size() <= 0) return headSentinel;
-
-      Node node = headSentinel.getNextNode();
-      while(node.getNextNode() != null) node = node.getNextNode();
-
-      return node;
     }
 
     // accessors
@@ -149,25 +145,19 @@ public class List_doublyLinked{
       (that is, increase the index associated with each).
      */
     public boolean add( int index, Object value) {
-        if(index == 0){
-          addAsHead(value);
-          return true;
-        }
-        
-        Node newNode = new Node( value);
-        Node prevNode = getNodeBefore(index);
 
-        System.out.println(prevNode.getCargo());
+        Node newNode = new Node(value);
+        Node nextNode = getNode(index);
+        Node prevNode = nextNode.getPrevNode();
 
-        if(prevNode.getNextNode() != null) {
-          prevNode.getNextNode().setPrevNode(newNode);
-        }
-        newNode.setNextNode(prevNode.getNextNode());
-
-        newNode.setPrevNode(prevNode);
+        nextNode.setPrevNode(newNode);
         prevNode.setNextNode(newNode);
 
+        newNode.setNextNode(nextNode);
+        newNode.setPrevNode(prevNode);
+
         return true;
+
     }
 
 
@@ -181,15 +171,12 @@ public class List_doublyLinked{
      */
     public Object remove( int index) {
         Node ax = getNode(index);
-        Node before = ax.getPrevNode();
+        Node prev = ax.getPrevNode();
         Node next = ax.getNextNode();
 
-        if(next != null){
-          next.setPrevNode(before);
-        }
-        before.setNextNode( next );
+        next.setPrevNode(prev);
+        prev.setNextNode( next );
 
-        Object saveForReturn = ax.getCargo();
-        return saveForReturn;
+        return ax.getCargo();
     }
 }

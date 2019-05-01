@@ -42,7 +42,7 @@ public class UserOfList {
         addAtTest( 3          , new String("d"), "5 elements [s,T,u,d,Y,]");
         addAtTest( 0          , new String("students")
                  , "6 elements [students,s,T,u,d,Y,]");
-        addAtTest( list.size()-1, new String("efficiently")
+        addAtTest( list.size(), new String("efficiently")
                  , "7 elements [students,s,T,u,d,Y,efficiently,]");
         System.out.println();
         
